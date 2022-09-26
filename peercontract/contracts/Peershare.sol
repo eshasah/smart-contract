@@ -5,30 +5,23 @@ import "./ECDSA.sol";
 
 // smart contract to add new user, new cars and any ride on the blockchain
 contract Peershare {
-    mapping(bytes32 => bytes) userSignature;
+    mapping(string => string) userSignature;
 
-    function addUser(bytes32 userHash, bytes memory signature)
+    function addUser(string calldata userHash, string memory signature)
         public
-        returns (bool)
+        returns (string memory)
     {
-        // Get signer from signature
-        address signer = ECDSA.recover(
-            ECDSA.toEthSignedMessageHash(
-                keccak256(abi.encodePacked(userHash, msg.sender))
-            ),
-            signature
-        );
-
-        // Verify if the sender is the owner
-        require(
-            signer == msg.sender,
-            "Unauthorised signer has been dectected."
-        );
+        // Verify if the user is unique in blockchain
+        if (bytes(userSignature[userHash]).length > 0) {
+            //console.log(userSignature[userHash]);
+            //user already exists
+            return string("user already exists");
+        }
 
         // Add user signature
         userSignature[userHash] = signature;
 
-        return true;
+        return string("new user added");
     }
 
     // TODO: add new car to blockchain
